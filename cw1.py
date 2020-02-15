@@ -20,9 +20,9 @@ class PythonOrgSearch(unittest.TestCase):
 	def setUp(self):
     	#driver = webdriver.Firefox()
     	#driver = webdriver.Ie(r'C:\Users\Justyna\Desktop\Python\Drivers\MicrosoftWebDriver.exe')
-		#driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
+		driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
 		#driver = webdriver.Chrome()
-		self.driver = webdriver.Remote(command_executor='http://185.238.75.153:22/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+		#self.driver = webdriver.Remote(command_executor='http://185.238.75.153:22/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
 
 	def tearDown(self):
 		self.screenshot("end")
