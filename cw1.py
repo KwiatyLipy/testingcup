@@ -10,7 +10,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 
-class PythonOrgSearch(unittest.TestCase):
+class testingcup(unittest.TestCase):
 
 	scr=0
 	folder = strftime("%Y-%m-%d %H.%M.%S", gmtime()) 
@@ -20,15 +20,14 @@ class PythonOrgSearch(unittest.TestCase):
 	def setUp(self):
     	#driver = webdriver.Firefox()
     	#driver = webdriver.Ie(r'C:\Users\Justyna\Desktop\Python\Drivers\MicrosoftWebDriver.exe')
-		driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
-		#driver = webdriver.Chrome()
-		#self.driver = webdriver.Remote(command_executor='http://185.238.75.153:22/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+		#driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
+		self.driver = webdriver.Remote(command_executor='http://localhost:4444/',desired_capabilities=DesiredCapabilities.CHROME) 
 
 	def tearDown(self):
 		self.screenshot("end")
 		self.driver.close()
 
-	def test_search_in_python_org(self):
+	def test(self):
 		driver = self.driver
 		driver.get("https://testingcup.pgs-soft.com/task_1")
 		tekst = "test"
@@ -100,7 +99,7 @@ class PythonOrgSearch(unittest.TestCase):
 def suite():
 	suite = unittest.TestSuite()
 
-	suite.addTest(PythonOrgSearch("test_search_in_python_org")) 
+	suite.addTest(testingcup("test")) 
 
 	return suite
 
