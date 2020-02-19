@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException 
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
+from functions import *
 
 class testingcup(unittest.TestCase):
 
@@ -18,13 +19,15 @@ class testingcup(unittest.TestCase):
 	Path(path).mkdir(parents=True, exist_ok=True)
 
 	def setUp(self):
-    	#driver = webdriver.Firefox()
-    	#driver = webdriver.Ie(r'C:\Users\Justyna\Desktop\Python\Drivers\MicrosoftWebDriver.exe')
-		#driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
-		self.driver = webdriver.Remote(command_executor='http://localhost:4444/',desired_capabilities=DesiredCapabilities.CHROME) 
+    	#self.driver = webdriver.Firefox()
+    	#self.driver = webdriver.Ie(r'C:\Users\Justyna\Desktop\Python\Drivers\MicrosoftWebDriver.exe')
+		self.driver = webdriver.Chrome(r'C:\Users\Justyna\Desktop\Python\chromedriver.exe')
+		#self.driver = webdriver.Remote(command_executor='http://localhost:4444/',desired_capabilities=DesiredCapabilities.CHROME) 
+		self.driver.implicitly_wait(10)
+		self.driver.delete_all_cookies()
+		self.driver.maximize_window() 
 
-	def tearDown(self):
-		self.screenshot("end")
+	def tearDown(self): 
 		self.driver.close()
 
 	def test(self):
@@ -34,67 +37,36 @@ class testingcup(unittest.TestCase):
 		ilosc = 0
 		suma = 0.00
 		Basket = []
-		quantityAll = self.check_element(By.CLASS_NAME, 'summary-quantity', "Lack of quantity in basket", tekst)
-		self.assertion(quantityAll, str(ilosc), "Incorrect quantity in basket", tekst)
-		priceAll = self.check_element(By.CLASS_NAME, 'summary-price', "Lack of price in basket", tekst)
-		self.assertion(priceAll, str("{0:.2f}".format(suma)) + ' zł', "Incorrect price in basket", tekst)
+		quantityAll = check_element(driver, By.CLASS_NAME, 'summary-quantity', "Lack of quantity in basket", tekst)
+		assertion(driver, quantityAll, str(ilosc), "Incorrect quantity in basket", tekst)
+		priceAll = check_element(driver, By.CLASS_NAME, 'summary-price', "Lack of price in basket", tekst)
+		assertion(driver, priceAll, str("{0:.2f}".format(suma)) + ' zł', "Incorrect price in basket", tekst)
 		for y in range(1,4):
 			for x in range(1,5):
 				pathX = "//form/div[" + str(y) + "]/div[" + str(x) + "]/div/div/h4"
-				Item = self.check_element(By.XPATH, pathX, "Lack of name for item", tekst)
+				Item = check_element(driver, By.XPATH, pathX, "Lack of name for item", tekst)
 				Basket.append(Item)
 				pathX = "//form/div[" + str(y) + "]/div[" + str(x) + "]/div/div/p[1]"
-				Item = self.check_element(By.XPATH, pathX, "Lack of price in basket", tekst).text
+				Item = check_element(driver, By.XPATH, pathX, "Lack of price in basket", tekst).text
 				price = Item.split(' ')
 				price = float(price[1])
 				pathX = "//form/div[" + str(y) + "]/div[" + str(x) + "]/div/div/div/input"
-				Item = self.check_element(By.XPATH, pathX, "Lack of option to add item", tekst)
+				Item = check_element(driver, By.XPATH, pathX, "Lack of option to add item", tekst)
 				Item.clear()
 				Item.send_keys('1') 
 				pathX = "//form/div[" + str(y) + "]/div[" + str(x) + "]/div/div/div/span/button"
-				Item = self.check_element(By.XPATH, pathX, "Lack of option to add item", tekst)
+				Item = check_element(driver, By.XPATH, pathX, "Lack of option to add item", tekst)
 				Item.click() 
 				ilosc =  ilosc + 1
 				suma = suma + price 
-				self.assertion(quantityAll, str(ilosc), "Incorrect quantity in basket", tekst) 
-				self.assertion(priceAll, str("{0:.2f}".format(suma)) + ' zł', "Incorrect price in basket", tekst)
+				assertion(driver, quantityAll, str(ilosc), "Incorrect quantity in basket", tekst) 
+				assertion(driver, priceAll, str("{0:.2f}".format(suma)) + ' zł', "Incorrect price in basket", tekst)
 				pathX = "//div[2]/div/div[2]/div[1]/div["+ str(ilosc) +"]/div[1]" 
-				Item = self.check_element(By.XPATH, pathX, "Lack of item in basket", tekst).text 
+				Item = check_element(driver, By.XPATH, pathX, "Lack of item in basket", tekst).text 
 				name = Item.split(' ')
-				self.assertion(Basket[ilosc-1], name[0], "Incorrect item in basket", tekst)
+				assertion(driver, Basket[ilosc-1], name[0], "Incorrect item in basket", tekst)
 				pass
 			pass
-
-
-	def check_element(self, how, what, error_exp_text, tekst):
-		driver = self.driver
-		try:
-			element = driver.find_element(how, what)
-		except NoSuchElementException as error:
-			self.screenshot(tekst)
-			print(error_exp_text + " \r\n %s" % error)
-		return element
-
-	def assertion(self, what, withwhat, error_text, tekst):
-		driver = self.driver
-		try:
-			assert what.text == withwhat
-		except AssertionError as error:
-			self.screenshot(tekst)
-			_, _, tb = sys.exc_info()
-			traceback.print_tb(tb) # Fixed format
-			tb_info = traceback.extract_tb(tb)
-			filename, line, func, text = tb_info[-1]
-			print(error_text + "\r\n")
-			print('An error occurred on line {} in statement {}'.format(line, text))
-		return
-
-	def screenshot(self, tekst):
-		screen = self.path + "\\" + tekst + str(self.scr) + '.png'
-		self.scr = self.scr + 1
-		self.driver.save_screenshot(screen)
-		return
-
 
 def suite():
 	suite = unittest.TestSuite()
@@ -106,5 +78,4 @@ def suite():
 if __name__== "__main__":
 	runner = unittest.TextTestRunner()
 	test_suite = suite()
-	runner.run (test_suite)
-	#unittest.main()
+	runner.run (test_suite) 
